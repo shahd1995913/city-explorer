@@ -1,4 +1,4 @@
-# Project Name
+# City Explorer
 
 **Author**: Shahd Nabeel Alkhatib
 **Version**: 1.0.0 
