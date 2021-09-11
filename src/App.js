@@ -54,10 +54,8 @@ class App extends React.Component {
 
     }
 
-
-
-
   }
+//   the render 
     render() {
       return (
         <>
