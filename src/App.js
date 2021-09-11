@@ -1,5 +1,6 @@
 import axios from "axios";
 import React from "react";
+import style from "../src/style.css"
 
 // This is done in date 2021-9-11 updated 
 class App extends React.Component {
@@ -10,7 +11,7 @@ class App extends React.Component {
       log: '',
       displayname: '',
       mapF: false,
-      displayErroe: ''
+    displayErroe: false,
     }
 
   }
@@ -48,19 +49,18 @@ class App extends React.Component {
     catch {
 
       console.log('Error');
-      this.state({ displayErroe: true });
+      console.log('error , Unable to geocode ')
+    //  this.state({ displayErroe: true });
 
     }
 
-
-
-
   }
+//   the render 
     render() {
       return (
         <>
 
-          <h1>Location App</h1>
+          <h1>--Search  on Location in React -- </h1>
           <form onSubmit={this.getLoc}>
 
             <input type='text' name='cityName' placeholder='Enter city Name please'></input>
@@ -92,6 +92,5 @@ class App extends React.Component {
 
   }
 
- =
-  
+ 
 export default App;
