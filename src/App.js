@@ -1,6 +1,11 @@
 import axios from "axios";
 import React from "react";
 import style from "../src/style.css"
+import 'bootstrap/dist/css/bootstrap.min.css';
+import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button';
+import Image from 'react-bootstrap/Image';
+import Row from 'react-bootstrap/Row';
 
 // This is done in date 2021-9-11 updated 
 class App extends React.Component {
@@ -11,10 +16,35 @@ class App extends React.Component {
       log: '',
       displayname: '',
       mapF: false,
-    displayErroe: false,
+      displayErroe: false,
+      weather: false,
+      weatherArr: [],
+      displayWeatherError: false,
     }
 
   }
+
+  weatherDataFunction = async (lat, lon) => {
+    let weatherUrl = `https://weather-app-lab-siven.herokuapp.com/weather?lat=${lat}&lon=${lon}`;
+    try {
+      let weatherData = await axios.get(weatherUrl)
+      this.setState({
+        weatherArr: weatherData.data,
+        weather: true
+      })
+    }
+    catch {
+      this.setState({
+        displayWeatherError: true
+      })
+    }
+  }
+
+
+
+
+
+
   // async in order use await 
   getLoc = async (event) => {
     event.preventDefault();
@@ -22,10 +52,12 @@ class App extends React.Component {
 
     const cityName = event.target.cityName.value;
     console.log(cityName)
-    const key = 'pk.ddfda21a6b66752b544d6177b64d789d';
+    this.weatherDataFunction(cityName);
+    // this.geatMovieDat(cityName);
+    const key = process.env.KEY;
     const URL = `https://eu1.locationiq.com/v1/search.php?key=${key}&q=${cityName}&format=json`;
     // const maprepresent = 
-  
+
     try {
 
       let responceData = await axios.get(URL); // give information get from API
@@ -41,56 +73,67 @@ class App extends React.Component {
 
 
       })
+      this.weatherDataFunction(this.state.lat, this.state.lon)
 
     }
-  
+
 
 
     catch {
 
       console.log('Error');
       console.log('error , Unable to geocode ')
-    //  this.state({ displayErroe: true });
+      //  this.state({ displayErroe: true });
 
     }
 
   }
-//   the render 
-    render() {
-      return (
-        <>
+  //   the render 
+  render() {
+    return (
+      <>
 
-          <h1>--Search  on Location in React -- </h1>
-          <form onSubmit={this.getLoc}>
+        <h1>--Search  on Location in React -- </h1>
+        <form onSubmit={this.getLoc}>
 
-            <input type='text' name='cityName' placeholder='Enter city Name please'></input>
-            <button type='submit'>Explore!</button>
-          </form>
+          <input type='text' name='cityName' placeholder='Enter city Name please'></input>
+          <button type='submit'>Explore!</button>
+        </form>
+
+        {this.state.weather && this.state.weatherArr.map(item => {
+
+          return (
+            <>
+              <p>Date: {item.date}</p>
+              <p>Description: {item.description}</p>
+            </>
+          )
+        })}
+
+        {// render Data
+        }
+
+        <p> Name : {this.state.displayname}</p>
+
+        <p>Latitude : {this.state.lat}</p>
+
+        <p>Longitude : {this.state.lon}</p>
 
 
+        {this.state.mapF &&
+          <img src={`https://maps.locationiq.com/v3/staticmap?key=pk.ddfda21a6b66752b544d6177b64d789d&center=${this.state.lat},${this.state.lon}`} alt='Map' />
+        }
 
-          {// render Data
-          }
+        {this.state.displayErroe && <p>error , Unable to geocode </p>}
 
-          <p> Nmae : {this.state.displayname}</p>
+        {this.state.displayWeatherError && <p>Sorry Error</p>}
+      </>
 
-          <p>Latitude : {this.state.lat}</p>
-
-          <p>Longitude : {this.state.lon}</p>
-
-
-          {this.state.mapF &&
-            <img src={`https://maps.locationiq.com/v3/staticmap?key=pk.ddfda21a6b66752b544d6177b64d789d&center=${this.state.lat},${this.state.lon}`} alt='Map' />
-          }
-
-{this.state.displayErroe && <p>error , Unable to geocode </p>    }
-        </>
-
-      )
-
-    }
+    )
 
   }
 
- 
+}
+
+
 export default App;
