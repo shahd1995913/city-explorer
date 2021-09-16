@@ -13,34 +13,57 @@ class App extends React.Component {
     super(props);
     this.state = {
       lat: '',
-      log: '',
+      lon: '',
       displayname: '',
       mapF: false,
       displayErroe: false,
       weather: false,
       weatherArr: [],
       displayWeatherError: false,
+      timezone: '',
+      countrycode: '',
+      latWeather: '',
+      lonWeather: '',
+
+      statecode: ''
+
     }
 
   }
-
-  weatherDataFunction = async (lat, lon) => {
-    let weatherUrl = `https://weather-app-lab-siven.herokuapp.com/weather?lat=${lat}&lon=${lon}`;
+  // https://weather-app-lab-siven.herokuapp.com/cityname
+ 
+  getweatherData = async (cityName) => {
+    console.log("Inside ", cityName)
+    let weatherUrl = `http://localhost:3014/weather?cityName=${cityName}`;
     try {
-      let weatherData = await axios.get(weatherUrl)
-      this.setState({
-        weatherArr: weatherData.data,
-        weather: true
+      if (cityName === 'Amman' || cityName === 'Paris' || cityName === 'Seattle') {
+        let WeatherData = await axios.get(weatherUrl)
+        this.setState({
+          weatherArr: WeatherData.data,
+          weather: true 
+         
+
       })
+      // console.log("Inside 2 ", weatherArr)
     }
+
+      else {
+
+        this.setState({
+          displayWeatherError: true
+        })
+
+      }
+    }
+
     catch {
       this.setState({
         displayWeatherError: true
       })
+
     }
   }
-
-
+ 
 
 
 
@@ -51,12 +74,16 @@ class App extends React.Component {
     // console.log('Hi')
 
     const cityName = event.target.cityName.value;
-    console.log(cityName)
-    this.weatherDataFunction(cityName);
+    // console.log(cityName)
+    this.getweatherData(cityName);
     // this.geatMovieDat(cityName);
-    const key = process.env.KEY;
-    const URL = `https://eu1.locationiq.com/v1/search.php?key=${key}&q=${cityName}&format=json`;
+    const key = 'pk.ddfda21a6b66752b544d6177b64d789d';
+    const URL = `https://eu1.locationiq.com/v1/search.php?key=pk.ddfda21a6b66752b544d6177b64d789d&q=${cityName}&format=json`;
     // const maprepresent = 
+
+
+
+
 
     try {
 
@@ -73,7 +100,7 @@ class App extends React.Component {
 
 
       })
-      this.weatherDataFunction(this.state.lat, this.state.lon)
+      this.getweatherData(cityName)
 
     }
 
@@ -92,44 +119,53 @@ class App extends React.Component {
   render() {
     return (
       <>
+   
+
+
 
         <h1>--Search  on Location in React -- </h1>
         <form onSubmit={this.getLoc}>
 
+
+
+
           <input type='text' name='cityName' placeholder='Enter city Name please'></input>
           <button type='submit'>Explore!</button>
         </form>
+        { this.state.weather &&  this.state.weatherArr.map(item => {
 
-        {this.state.weather && this.state.weatherArr.map(item => {
+return (
+  <>
+    <p>Date: {item.date}</p>
+    <p>Description: {item.desc}</p>
+  </>
+)
+})}
 
-          return (
-            <>
-              <p>Date: {item.date}</p>
-              <p>Description: {item.description}</p>
-            </>
-          )
-        })}
 
-        {// render Data
-        }
 
         <p> Name : {this.state.displayname}</p>
 
-        <p>Latitude : {this.state.lat}</p>
+<p>Latitude : {this.state.lat}</p>
 
-        <p>Longitude : {this.state.lon}</p>
+<p>Longitude : {this.state.lon}</p>
 
 
-        {this.state.mapF &&
-          <img src={`https://maps.locationiq.com/v3/staticmap?key=pk.ddfda21a6b66752b544d6177b64d789d&center=${this.state.lat},${this.state.lon}`} alt='Map' />
-        }
+{this.state.mapF &&
+  <img src={`https://maps.locationiq.com/v3/staticmap?key=pk.ddfda21a6b66752b544d6177b64d789d&center=${this.state.lat},${this.state.lon}`} alt='Map' />
+}
 
-        {this.state.displayErroe && <p>error , Unable to geocode </p>}
+       
 
-        {this.state.displayWeatherError && <p>Sorry Error</p>}
+
+
+       
+        {/* {this.state.displayErroe && <p>error , Unable to geocode </p>}
+
+        {this.state.displayWeatherError && <p>Sorry Error</p>} */}
       </>
 
-    )
+    );
 
   }
 
