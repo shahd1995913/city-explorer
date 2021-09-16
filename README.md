@@ -11,7 +11,7 @@ There are inputs which are the name of a city and the output will be the name of
 1. clone for repo
 2. npm i - download package 
 3. npm start- Runs the app in the development mode.
-
+4. in env file use REACT_APP_ in react app
 
 ## Architecture
 ### languages : React , Javascript
