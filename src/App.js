@@ -1,7 +1,11 @@
+// import Form from 'react-bootstrap/Form'
+import Button from 'react-bootstrap/Button'
+
 import axios from "axios";
 import React from "react";
-import Movies from "./movies";
-import Weather from "./Weather";
+
+import MovieMain from './components/MovieMain';
+import Weather from './components/Weather';
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -9,97 +13,107 @@ class App extends React.Component {
       lat: "",
       lon: "",
       displayName: "",
-      mapFlag: false,
+      display:false,
       displayErr: false,
-      displayMoviesErr: false,
-      movieFlag: false,
-      weatherFlag: false,
+      description:'',
+      date:'', 
+    
+  
       weatherData: [],
+      movieData:[]
     };
   }
-  getMoviesData = async (cityName) => {
+  getMoviesData = async (event) => 
+  {   
+    event.preventDefault();
+    const cityName=event.target.cityName.value
+    const url_movie =`http://localhost:3015/movies?name=${cityName}`
+
     try {
-      let moviesresult = await axios.get(
-        `http://localhost:3014/movies?query=${cityName}`
-      );
-      console.log(moviesresult.data);
+
+      let moviesresult = await axios.get(url_movie);
+     
       this.setState({
-        movieFlag: true,
-        moviesArray: moviesresult.data,
-      });
-    } catch {
+        movieData: moviesresult.data,
+        display:true});
+
+let data_json=await axios.get(url_movie)
+this.setState({
+  movieData:data_json.data,
+
+})
+
+    }
+    
+    catch {
       this.setState({
-        displayMoviesErr: true,
+     displayErr:true
       });
     }
   };
 
-  getWeatherData = async (cityName, lat, lon) => {
-    // try {
-    let result2 = await axios.get(
-      `http://localhost:3014/weather?cityName=${cityName}&lat=${lat}&lon=${lon}`
-    );
+  getWeatherData = async (event) => {
+    {   
+      event.preventDefault();
+      const cityName=event.target.cityName.value
 
-    this.setState({
-      weatherData: result2.data,
-      weatherFlag: true,
-    });
+      const URL = `https://us1.locationiq.com/v1/search.php?key=${process.env.REACT_APP_LOCATION}&q=${cityName}&format=json`
+
+      const url_weather = `http://localhost:3015/weather?name=${cityName}`
+  
+      try {
+  
+        let weatherresult = await axios.get(URL);
+       
+        this.setState({
+          lat:weatherresult.data[0].lat,
+          lon:weatherresult.data[0].lon,
+          displayName:weatherresult.data[0].displayName,
+          
+          display:true});
+  
+  let data_json=await axios.get(url_weather)
+  this.setState({
+    weatherData:data_json.data,
+  
+  })
+  
+      }
+      
+      catch {
+        this.setState({
+       displayErr:true
+        });
+      }
+      this.getMoviesData(event)
+    };
 
    
   };
-  getData = async (event) => {
-    event.preventDefault();
-    let cityName = event.target.cityName.value;
-    let myKey = process.env.REACT_APP_LOCATION;
-    let url = `https://us1.locationiq.com/v1/search.php?key=${myKey}&q=${cityName}&format=json`;
-    try {
-      let result = await axios.get(url);
-      console.log(result.data);
-      this.setState({
-        lat: result.data[0].lat,
-        lon: result.data[0].lon,
-        displayName: result.data[0].display_name,
-        mapFlag: true,
-      });
-      this.getWeatherData(cityName, this.state.lat, this.state.lon);
-      this.getMoviesData(cityName);
-
-    } catch {
-      console.log("err");
-      this.setState({
-        displayErr: true,
-      });
-    }
-  };
+ 
   render() {
     return (
       <>
         <h1>Location App</h1>
-        <form onSubmit={this.getData}>
+
+        <form onSubmit={this.getWeatherData}>
+
           <input type="text" name="cityName" placeholder="Enter city name" />
-          <button type="submit">Get Location</button>
+
+          <Button type="submit">Get Location</Button>
         </form>
-        <p>Display Name: {this.state.displayName} </p>
-        <p>Lat: {this.state.lat} </p>
-        <p>Lon: {this.state.lon} </p>
-        {this.state.mapFlag && (
-          <img
-            src={`https://maps.locationiq.com/v3/staticmap?key=${process.env.REACT_APP_LOCATION}&center=${this.state.lat},${this.state.lon}`}
-            alt="map"
-          />
-        )}
-        <h1>Weather</h1>
-        {this.state.weatherFlag &&
-          this.state.weatherData.map(function (w, i) {
-            return <Weather date={w.date} description={w.description} />;
-          })}
-        {this.state.displayErr && <p>Sorry Error</p>}
-        <h1>Movies</h1>
-        {this.state.displayMoviesErr && <h2>Error</h2>}
-        {this.state.movieFlag && this.state.moviesArray.map(function (w, i) {
-            return <Movies moviesArray={w} />;
-          })
-          }
+
+       
+       
+        <img src={`https://maps.locationiq.com/v3/staticmap?key=${process.env.REACT_APP_LOCATION}&center=${this.state.lat},${this.state.lon}&zoom=18&size=500x500&format=png&maptype=<MapType>&markers=icon:<icon>|<latitude>,<longitude>&markers=icon:<icon>|<latitude>,<longitude>`}/>
+
+
+
+
+        <Weather display={this.state.display} weatherData={this.state.weatherData}/>
+        <MovieMain display={this.state.display} movieData={this.state.movieData}/>
+        )
+
       </>
     );
   }
