@@ -27,7 +27,7 @@ class App extends React.Component {
   {   
     event.preventDefault();
     const cityName=event.target.cityName.value
-    const url_movie =`http://localhost:3015/movies?name=${cityName}`
+    const url_movie =`https://lab-city.herokuapp.com/movies?name=${cityName}`
 
     try {
 
@@ -59,7 +59,7 @@ this.setState({
 
       const URL = `https://us1.locationiq.com/v1/search.php?key=${process.env.REACT_APP_LOCATION}&q=${cityName}&format=json`
 
-      const url_weather = `http://localhost:3015/weather?name=${cityName}`
+      const url_weather = `https://lab-city.herokuapp.com/weather?name=${cityName}`
   
       try {
   
